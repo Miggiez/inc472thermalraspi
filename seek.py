@@ -35,6 +35,7 @@ class SeekPro():
     if not self.dev:
       raise IOError('Device not found')
     self.dev.set_configuration()
+    self.dev.reset()
     self.calib = None
     for i in range(5):
       # Sometimes, the first frame does not have id 4 as expected...
@@ -175,7 +176,9 @@ if __name__ == '__main__':
     while(client_socket):
       r = cam.get_image()
       r_new = rescale(r)
-      a = pickle.dumps(r_new)
+      r_color = cv2.applyColorMap(r_new, cv2.COLORMAP_JET)
+      r_rgb = cv2.cvtColor(r_color, cv2.COLOR_BGR2RGB)
+      a = pickle.dumps(r_rgb)
       message = struct.pack("Q", len(a))+a
       client_socket.sendall(message)
       
@@ -183,3 +186,4 @@ if __name__ == '__main__':
       if key ==ord('q'):
         client_socket.close()
         break
+      
